@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Dia dos Namorados, Meu Amor! ❤️</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Pacifico (para títulos) e Montserrat (para corpo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Define a fonte Montserrat para todo o corpo, Pacifico para títulos */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Evita rolagem horizontal */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23e91e63"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C15.09 3.81 16.76 3 18.5 3 21.58 3 24 5.42 24 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') 12 12, auto; /* Cursor de coração */
+        }
+
+        h1, h2 {
+            font-family: 'Pacifico', cursive;
+        }
+
+        /* Animação de carregamento */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom right, #fce4ec, #ffcdd2); /* Tons de rosa e vermelho */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            transition: opacity 1s ease-out, visibility 1s ease-out;
+            color: #d81b60; /* Cor do texto */
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #e91e63; /* Pink */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        /* Fundo com corações flutuantes */
+        .heart-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom right, #ffebee, #f8bbd0); /* Gradient suave */
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .heart {
+            position: absolute;
+            background-color: #ef9a9a; /* Coração rosa claro */
+            transform: rotate(-45deg);
+            animation: float 10s ease-in-out infinite;
+            opacity: 0; /* Começa invisível */
+            filter: drop-shadow(0 0 5px rgba(255, 100, 100, 0.5));
+        }
+
+        .heart:before,
+        .heart:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: inherit; /* Herda a cor do coração */
+            border-radius: 50%;
+        }
+
+        .heart:before {
+            top: -50%;
+            left: 0;
+        }
+
+        .heart:after {
+            top: 0;
+            left: 50%;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0) rotate(-45deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            50% { transform: translateY(-500px) translateX(var(--x-offset, 0px)) rotate(-45deg); }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-1000px) translateX(var(--x-offset, 0px)) rotate(-45deg); opacity: 0; }
+        }
+
+        /* Sparkle animation */
+        .sparkle {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: sparkle-float 2s ease-out forwards;
+            box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.7);
+        }
+
+        @keyframes sparkle-float {
+            0% { transform: scale(0) translateY(0); opacity: 0; }
+            20% { transform: scale(1) translateY(-10px); opacity: 1; }
+            100% { transform: scale(0.5) translateY(-50px); opacity: 0; }
+        }
+
+        /* Estilo para vales */
+        .voucher-card {
+            background-color: white;
+            border: 3px dashed #f48fb1; /* Borda pontilhada rosa */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Sombra mais suave */
+            transition: all 0.4s ease-in-out;
+            border-radius: 20px; /* Mais arredondado */
+            position: relative;
+        }
+
+        .voucher-card.used {
+            opacity: 0.6;
+            filter: grayscale(80%);
+            border-color: #90a4ae; /* Borda cinza para usado */
+            cursor: not-allowed;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .voucher-card.used button {
+            background-color: #90a4ae;
+            cursor: not-allowed;
+        }
+
+        .voucher-card:not(.used):hover {
+            transform: translateY(-8px) scale(1.03); /* Movimento mais pronunciado */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+            border-color: #e91e63; /* Borda mais vibrante no hover */
+        }
+
+        /* Estilo do botão */
+        .button-primary {
+            background-color: #e91e63; /* Pink */
+            color: white;
+            padding: 12px 28px; /* Maior padding */
+            border-radius: 9999px; /* Arredondado */
+            font-weight: bold;
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button-primary:hover {
+            background-color: #c2185b; /* Darker pink */
+            transform: translateY(-3px) scale(1.02); /* Movimento mais sutil */
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .button-primary:disabled {
+            background-color: #b0bec5; /* Grey */
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Glitter effect on button hover */
+        .button-primary:not(:disabled):hover::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            animation: glitter 0.5s ease-out forwards;
+        }
+
+        @keyframes glitter {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 0; }
+        }
+
+
+        /* Estilo para a galeria de fotos */
+        .gallery-item {
+            overflow: hidden;
+            border-radius: 20px; /* Mais arredondado */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
+            transition: transform 0.4s ease-in-out;
+            border: 3px solid #ffcdd2; /* Borda rosa suave */
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.08); /* Mais zoom */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: #f48fb1;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.15); /* Mais zoom na imagem */
+        }
+
+        /* Estilo para as seções principais */
+        .content-section-card {
+            background-color: white;
+            background-opacity: 0.9;
+            border-radius: 25px; /* Bem arredondado */
+            padding: 30px;
+            margin-bottom: 2.5rem; /* Ajuste para espaçamento */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border: 4px solid #ffccbc; /* Borda mais grossa e suave */
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .content-section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Estilo para as mensagens personalizadas */
+        #custom-message-box {
+            animation: fade-in-out 3.5s forwards;
+        }
+
+        @keyframes fade-in-out {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        #custom-confirm-box > div {
+            animation: pop-in 0.3s ease-out forwards;
+        }
+
+        @keyframes pop-in {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-red-100 min-h-screen flex flex-col justify-center items-center relative">
+
+    <!-- Fundo com corações flutuantes -->
+    <div class="heart-background"></div>
+
+    <!-- Animação de carregamento -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p class="text-3xl font-semibold loading-text">Carregando nosso amor...</p>
+    </div>
+
+    <!-- Música de fundo -->
+    <audio id="background-music" loop autoplay>
+        <!-- Por favor, substitua 'SUA_MUSICA_AQUI.mp3' pela URL da sua música favorita. -->
+        <!-- Exemplo de música royalty-free (apenas para teste, pode não ser a ideal): -->
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+
+    <main class="container mx-auto px-4 py-8 text-center relative z-10 max-w-4xl w-full">
+        <!-- Título principal -->
+        <h1 class="text-6xl md:text-7xl font-bold text-rose-700 mb-8 drop-shadow-lg animate-fade-in-down">
+            Feliz Dia dos Namorados, Meu Amor!
+        </h1>
+
+        <!-- Mensagem principal -->
+        <div class="content-section-card max-w-2xl mx-auto">
+            <p class="text-xl md:text-2xl text-rose-600 leading-relaxed animate-fade-in">
+                Desde que nossos olhares se cruzaram, meu mundo se transformou em um jardim de cores vibrantes. Cada riso, cada abraço, cada instante ao seu lado é o meu presente mais precioso. Este cantinho especial na web é um espelho do amor que transborda em mim por você!
+            </p>
+        </div>
+
+        <!-- Contador de tempo -->
+        <div class="content-section-card">
+            <h2 class="text-4xl font-semibold text-rose-700 mb-4 animate-fade-in">Nosso Amor Celebra:</h2>
+            <div id="countdown" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-rose-900 font-bold text-3xl md:text-4xl animate-fade-in-up">
+                <div><span id="years">0</span> <span class="text-xl block">Anos</span></div>
+                <div><span id="months">0</span> <span class="text-xl block">Meses</span></div>
+                <div><span id="days">0</span> <span class="text-xl block">Dias</span></div>
+                <div><span id="hours">0</span> <span class="text-xl block">Horas</span></div>
+                <div><span id="minutes">0</span> <span class="text-xl block">Minutos</span></div>
+                <div><span id="seconds">0</span> <span class="text-xl block">Segundos</span></div>
+            </div>
+            <p class="text-lg text-gray-600 mt-6">Desde 14 de Junho de 2024</p>
+        </div>
+
+        <!-- Galeria de Fotos -->
+        <section class="content-section-card">
+            <h2 class="text-4xl font-semibold text-rose-700 mb-6 drop-shadow-md animate-fade-in">Nossos Momentos Especiais</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Substitua as URLs das imagens pelas suas fotos reais -->
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/ffccbc/bf360c?text=Nós+Juntos+1" alt="Foto de casal 1" class="w-full h-auto">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/ffccbc/bf360c?text=Nós+Juntos+2" alt="Foto de casal 2" class="w-full h-auto">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/ffccbc/bf360c?text=Nós+Juntos+3" alt="Foto de casal 3" class="w-full h-auto">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/ffccbc/bf360c?text=Nós+Juntos+4" alt="Foto de casal 4" class="w-full h-auto">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/ffccbc/bf360c?text=Nós+Juntos+5" alt="Foto de casal 5" class="w-full h-auto">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/ffccbc/bf360c?text=Nós+Juntos+6" alt="Foto de casal 6" class="w-full h-auto">
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Vales de Amor -->
+        <section class="content-section-card">
+            <h2 class="text-4xl font-semibold text-rose-700 mb-6 drop-shadow-md animate-fade-in">Seus Vales de Amor!</h2>
+            <p class="text-lg text-rose-600 mb-8 max-w-2xl mx-auto">
+                Aqui estão alguns vales especiais, feitos com carinho, para você usar quando quiser. Mas lembre-se:
+                cada um pode ser resgatado **apenas uma vez**!
+            </p>
+            <div id="voucher-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Vales serão injetados aqui pelo JavaScript -->
+            </div>
+        </section>
+
+        <!-- Mensagem Final -->
+        <section class="content-section-card">
+            <h2 class="text-3xl font-semibold text-rose-700 mb-4 animate-fade-in">Minha eterna namorada e o amor da minha vida...</h2>
+            <p class="text-lg text-rose-600 leading-relaxed">
+                Você é a melodia que embala meus dias, a luz que dissipa qualquer escuridão e a inspiração que me impulsiona a ser a melhor versão de mim. Cada sorriso seu é um pôr do sol em minha alma, e cada toque, a prova de um carinho sem fim. Obrigada por cada aventura, por cada momento de cumplicidade e por encher minha vida com tanto amor. Mal posso esperar para escrever os próximos capítulos da nossa história! Eu te amo mais do que as palavras podem expressar, a cada batida do meu coração.
+            </p>
+            <p class="text-xl font-bold text-rose-800 mt-6">Com todo meu amor, [Seu Nome Aqui]</p>
+        </section>
+
+    </main>
+
+    <script>
+        // Data de início do namoro
+        const startDate = new Date('2024-06-14T00:00:00'); // 14 de Junho de 2024
+
+        // Função para atualizar o contador
+        function updateCountdown() {
+            const now = new Date();
+            const diff = now.getTime() - startDate.getTime(); // Diferença em milissegundos
+
+            // Calcula anos, meses, dias, horas, minutos, segundos
+            const seconds = Math.floor(diff / 1000) % 60;
+            const minutes = Math.floor(diff / (1000 * 60)) % 60;
+            const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+            // Cálculo aproximado de meses e anos para exibição
+            // Para maior precisão em meses/anos, seria necessário uma biblioteca de data/hora mais robusta.
+            // Aqui, faremos uma estimativa baseada nos dias.
+            const totalMonths = Math.floor(days / 30.44); // Média de dias por mês
+            const years = Math.floor(totalMonths / 12);
+            const remainingMonths = totalMonths % 12;
+
+            document.getElementById('years').textContent = years;
+            document.getElementById('months').textContent = remainingMonths;
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
+        }
+
+        // Atualiza o contador a cada segundo
+        setInterval(updateCountdown, 1000);
+        // Chama a função uma vez para exibir imediatamente
+        updateCountdown();
+
+        // Array de vales (JSON)
+        let vouchers = [
+            { id: 1, description: "Um jantar romântico feito por mim", used: false },
+            { id: 2, description: "Uma massagem relaxante de 30 minutos", used: false },
+            { id: 3, description: "Um dia inteiro de 'o que você quiser'", used: false },
+            { id: 4, description: "Um abraço apertado e demorado", used: false },
+            { id: 5, description: "Uma noite de filmes e pipoca", used: false },
+            { id: 6, description: "Um café na cama no fim de semana", used: false }
+        ];
+
+        // Carregar estado dos vales do localStorage
+        function loadVouchers() {
+            const storedVouchers = localStorage.getItem('valentinesVouchers');
+            if (storedVouchers) {
+                vouchers = JSON.parse(storedVouchers);
+            }
+        }
+
+        // Salvar estado dos vales no localStorage
+        function saveVouchers() {
+            localStorage.setItem('valentinesVouchers', JSON.stringify(vouchers));
+        }
+
+        // Renderizar vales na página
+        function renderVouchers() {
+            const voucherListDiv = document.getElementById('voucher-list');
+            voucherListDiv.innerHTML = ''; // Limpa a lista antes de renderizar
+
+            vouchers.forEach(voucher => {
+                const voucherCard = document.createElement('div');
+                voucherCard.className = `voucher-card p-6 rounded-2xl flex flex-col justify-between items-center text-rose-800 transition-all duration-300 ${voucher.used ? 'used' : ''}`;
+
+                voucherCard.innerHTML = `
+                    <p class="text-lg font-medium text-center mb-4">${voucher.description}</p>
+                    <button data-id="${voucher.id}" class="button-primary text-sm px-6 py-3 rounded-full shadow-md">
+                        ${voucher.used ? 'Vale Resgatado!' : 'Resgatar Vale'}
+                    </button>
+                    ${voucher.used ? '<span class="absolute top-2 right-2 text-rose-500 font-bold text-xs bg-rose-100 px-2 py-1 rounded-full opacity-80">USADO</span>' : ''}
+                `;
+
+                const button = voucherCard.querySelector('button');
+                if (voucher.used) {
+                    button.disabled = true;
+                } else {
+                    button.addEventListener('click', () => {
+                        // Confirmação personalizada (não use alert())
+                        showCustomConfirm('Tem certeza que deseja resgatar este vale?', () => {
+                            useVoucher(voucher.id);
+                        });
+                    });
+                }
+                voucherListDiv.appendChild(voucherCard);
+            });
+        }
+
+        // Função para usar um vale
+        function useVoucher(id) {
+            const voucherIndex = vouchers.findIndex(v => v.id === id);
+            if (voucherIndex !== -1 && !vouchers[voucherIndex].used) {
+                vouchers[voucherIndex].used = true;
+                saveVouchers();
+                renderVouchers(); // Re-renderiza para atualizar o estado visual
+                showMessage('Vale resgatado com sucesso! 🎉', 'success');
+            } else if (vouchers[voucherIndex].used) {
+                showMessage('Este vale já foi resgatado!', 'info');
+            }
+        }
+
+        // Animação de corações flutuantes
+        function createHeart() {
+            const heartBackground = document.querySelector('.heart-background');
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            const size = Math.random() * 25 + 15; // Tamanho entre 15px e 40px
+            heart.style.width = `${size}px`;
+            heart.style.height = `${size}px`;
+            heart.style.left = `${Math.random() * 100}%`; // Posição horizontal aleatória
+            heart.style.animationDuration = `${Math.random() * 6 + 7}s`; // Duração da animação entre 7s e 13s
+            heart.style.animationDelay = `${Math.random() * 2}s`; // Atraso na animação
+            heart.style.setProperty('--x-offset', `${(Math.random() - 0.5) * 200}px`); // Deslocamento horizontal
+
+            // Variação de cor (tons de rosa/vermelho)
+            const colors = ['#ef9a9a', '#f48fb1', '#ffcdd2', '#e91e63'];
+            heart.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+            heartBackground.appendChild(heart);
+
+            // Remove o coração após a animação para evitar sobrecarga de elementos
+            heart.addEventListener('animationend', () => {
+                heart.remove();
+            });
+        }
+
+        // Cria novos corações periodicamente
+        setInterval(createHeart, 500); // Cria um coração a cada 0.5 segundos
+
+        // Animação de brilhos (sparkles)
+        function createSparkle() {
+            const mainContent = document.querySelector('main'); // Colocar sparkles sobre o conteúdo principal
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            const size = Math.random() * 4 + 2; // Tamanho entre 2px e 6px
+            sparkle.style.width = `${size}px`;
+            sparkle.style.height = `${size}px`;
+            sparkle.style.left = `${Math.random() * 100}%`;
+            sparkle.style.top = `${Math.random() * 100}%`;
+            sparkle.style.animationDelay = `${Math.random() * 3}s`; // Atraso para stagger
+            mainContent.appendChild(sparkle);
+
+            sparkle.addEventListener('animationend', () => {
+                sparkle.remove();
+            });
+        }
+
+        // Cria novos brilhos periodicamente
+        setInterval(createSparkle, 150); // Cria um brilho a cada 0.15 segundos
+
+        // Esconde a animação de carregamento quando a página está pronta
+        window.addEventListener('load', () => {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            loadingOverlay.classList.add('hidden');
+
+            // Tenta reproduzir a música automaticamente. Pode ser bloqueado por navegadores.
+            const music = document.getElementById('background-music');
+            music.volume = 0.3; // Define um volume mais baixo
+            music.play().catch(error => {
+                console.log('Autoplay de música bloqueado:', error);
+                // Opcional: mostrar um botão para o usuário iniciar a música
+            });
+
+            loadVouchers();
+            renderVouchers();
+        });
+
+
+        // --- Funções para Mensagens Personalizadas (no lugar de alert/confirm) ---
+
+        let currentMessageTimeout;
+
+        function showMessage(message, type = 'default') {
+            const existingMessage = document.getElementById('custom-message-box');
+            if (existingMessage) {
+                existingMessage.remove();
+                clearTimeout(currentMessageTimeout);
+            }
+
+            const messageBox = document.createElement('div');
+            messageBox.id = 'custom-message-box';
+            messageBox.className = `fixed top-5 left-1/2 -translate-x-1/2 p-4 rounded-lg shadow-lg z-50 opacity-0 transform-gpu translate-y-[-20px]`;
+
+            if (type === 'success') {
+                messageBox.classList.add('bg-green-500', 'text-white');
+            } else if (type === 'info') {
+                messageBox.classList.add('bg-blue-500', 'text-white');
+            } else if (type === 'error') {
+                messageBox.classList.add('bg-red-500', 'text-white');
+            } else {
+                messageBox.classList.add('bg-gray-800', 'text-white');
+            }
+
+            messageBox.textContent = message;
+            document.body.appendChild(messageBox);
+
+            // A animação de fade-in-out é controlada pelo CSS, então não precisamos de timeouts aqui
+            // A classe inicial `opacity-0` e `translate-y-[-20px]` será sobrescrita pela keyframe `fade-in-out`
+        }
+
+        function showCustomConfirm(message, onConfirm) {
+            const existingConfirm = document.getElementById('custom-confirm-box');
+            if (existingConfirm) existingConfirm.remove();
+
+            const confirmBox = document.createElement('div');
+            confirmBox.id = 'custom-confirm-box';
+            confirmBox.className = `fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50`;
+
+            confirmBox.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full text-center">
+                    <p class="text-lg text-gray-800 mb-6">${message}</p>
+                    <div class="flex justify-around">
+                        <button id="confirm-yes" class="button-primary bg-green-600 hover:bg-green-700 px-6 py-2">Sim</button>
+                        <button id="confirm-no" class="button-primary bg-red-600 hover:bg-red-700 px-6 py-2">Não</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmBox);
+
+            document.getElementById('confirm-yes').addEventListener('click', () => {
+                onConfirm();
+                confirmBox.remove();
+            });
+
+            document.getElementById('confirm-no').addEventListener('click', () => {
+                confirmBox.remove();
+            });
+        }
+
+        // Animação de entrada para o conteúdo principal
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainElements = document.querySelectorAll('.animate-fade-in-down, .animate-fade-in, .animate-fade-in-up');
+            mainElements.forEach((el, index) => {
+                el.style.animationDelay = `${0.5 + index * 0.1}s`; // Atraso escalonado
+            });
+        });
+    </script>
+    <style>
+        @keyframes fade-in-down {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-down {
+            animation: fade-in-down 0.8s ease-out forwards;
+            opacity: 0; /* Começa invisível */
+        }
+        .animate-fade-in {
+            animation: fade-in 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .animate-fade-in-up {
+            animation: fade-in-up 0.8s ease-out forwards;
+            opacity: 0;
+        }
+    </style>
+</body>
+</html>
