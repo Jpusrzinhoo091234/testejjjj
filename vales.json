@@ -1,0 +1,30 @@
+[
+    {
+      "id": "1",
+      "name": "Jantar Romântico",
+      "active": true,
+      "description": "Um jantar romântico feito por mim",
+      "used": false
+    },
+    {
+      "id": "2",
+      "name": "Massagem Relaxante",
+      "active": true,
+      "description": "Uma massagem relaxante de 30 minutos",
+      "used": false
+    },
+    {
+      "id": "3",
+      "name": "Dia dao 'O que você quiser'",
+      "active": true,
+      "description": "Um dia inteiro de 'o que você quiser'",
+      "used": false
+    },
+    {
+      "id": "4",
+      "name": "Vale Inativo Exemplo",
+      "active": false,
+      "description": "Este vale está inativo e não aparecerá na lista",
+      "used": false
+    }
+  ]
